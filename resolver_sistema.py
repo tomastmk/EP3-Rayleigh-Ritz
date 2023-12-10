@@ -1,4 +1,3 @@
-import random
 
 # O elemento aij tem índices ij na matriz "original", mas índices i_mod e i na matriz "modificada". Essa função faz a conversão de índices e retorn o elemento aij.
 def aij(matriz,i,j,b): 
@@ -120,9 +119,6 @@ def LtXDY(Lower,b,Diagonal,Y):
         
         
         if Diagonal[i]==0:
-            print()
-            print(bcolors.BOLD+"O sistema possui uma linha nula"+bcolors.ENDC)
-            print()
             return 0
         
         xi = Y[i]/Diagonal[i]-soma
