@@ -1,6 +1,7 @@
 from solve_SDP.main import system_solve  #EP2
 import matplotlib.pyplot as plt
 import numpy as np
+import sympy as sp
 
 class bcolors:
     OKBLUE    = '\033[94m'
@@ -99,7 +100,7 @@ def main():
     global X
     global H
     
-    entrada = [0,1,100]
+    entrada = [0,1,50]
     #list(map(int,input('Digite a, b e n no formato "a,b,n" \n\n').split(",")))
     
     a = entrada[0]
@@ -113,31 +114,36 @@ def main():
     A = matrix_A()
     D = matrix_D()
 
-    c = list(map(lambda a: a,system_solve(A,D,1)))
+    c = system_solve(A,D,1)
     
     # Adiciona c_0 e c_(n+1)
     c.insert(0,0)
     c.append(0)
     
+    '''
     print("\nA = ",A)
     print("\nD = ",D)
-    print("\nc = ",c,"\n")
-    
+    print("\nc = ",c)
+    '''
+
     # u(x)
-    eixo_x = np.linspace(0,1,N)
+    eixo_x = np.linspace(0,1,N+1)
     eixo_y = list(map(lambda a: 0.5*a*(1-a),eixo_x))#list(map(lambda a: np.sin(np.pi*a),eixo_x))
     plt.plot(eixo_x,eixo_y)
 
     # Plot v_barra
     plt.scatter(X,c,color="r")
+    plt.legend("uv")
     
-   
-    
+    plt.xlabel('x')
+    plt.ylabel('y')
+
+    print(bcolors.BOLD+"\nErro máximo: "+bcolors.ENDC,erro(eixo_y,c),"\n")
+
     plt.show()
     
-    print(bcolors.BOLD+"Erro máximo: "+bcolors.ENDC,erro(eixo_y,c),"\n")
     
-    
+    d
     
     
 main()
