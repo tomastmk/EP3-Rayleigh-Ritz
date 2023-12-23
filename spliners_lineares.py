@@ -1,6 +1,17 @@
-from solve_SDP.main import system_solve
+from solve_SDP.main import system_solve  #EP2
 import matplotlib.pyplot as plt
 import numpy as np
+
+class bcolors:
+    OKBLUE    = '\033[94m'
+    OKGREEN   = '\033[92m'
+    WARNING   = '\033[93m'
+    RED = "\033[0;31m"
+    BROWN = "\033[0;33m"
+    PURPLE = "\033[0;35m"
+    CYAN = "\033[0;36m"
+    BOLD = "\033[1m"
+    ENDC = "\033[0m"
 
 def matrix_D():
     
@@ -41,9 +52,9 @@ def matrix_A():
         A[0].append( Q3+Q4+Q5+Q6 )
         
     # Segunda Diagonal Principal
-    for i in range(n):
+    for i in range(n-2):
         
-        Q7 = p( (x[i]+x[i+1])/2 ) / h
+        Q7 = -p( (x[i]+x[i+1])/2 ) / h
         Q8 = q( (x[i]+x[i+1])/2 ) / 2
         
         A[1].append( Q7+Q8 )
@@ -55,7 +66,7 @@ def f(x):
     return -1 #2*np.pi**2*np.sin(np.pi*x)
 
 def p(x):
-    return 1
+    return -1
 
 def q(x):
     return 0 #np.pi**2
@@ -67,18 +78,19 @@ def v_barra(x,i,c1,c2):
 
 def erro(u,v):
     x = X
+    erros = []
     
-    temp = []
+    for ui,vi in zip(u,v):
+        erro = abs(ui-vi)
+        erros.append(erro)
+        
+    max = 0
     
-    for xi in x:
-        temp.append(abs(u(xi)-v(xi)))
+    for erro in erros:
+        if erro>max:
+            max = erro
         
-    temp = 0
-    for erro in temp:
-        if erro>temp:
-            temp = erro
-        
-    return temp
+    return max
 
       
 def main():
@@ -87,14 +99,12 @@ def main():
     global X
     global H
     
-    entrada = [0,1,10]
+    entrada = [0,1,100]
     #list(map(int,input('Digite a, b e n no formato "a,b,n" \n\n').split(",")))
-    
     
     a = entrada[0]
     b = entrada[1]
     N = entrada[2]
-    
     
     H = (b-a)/(N)
     X = [ a+i*H for i in range(N+1) ]
@@ -103,38 +113,31 @@ def main():
     A = matrix_A()
     D = matrix_D()
 
-    c = system_solve(A,D,1)
+    c = list(map(lambda a: a,system_solve(A,D,1)))
     
+    # Adiciona c_0 e c_(n+1)
     c.insert(0,0)
     c.append(0)
-    
     
     print("\nA = ",A)
     print("\nD = ",D)
     print("\nc = ",c,"\n")
     
-    v = []
-
-    
-    for i in range(len(X)-2):
-        
-        v.append(v_barra(X[i],i,c[i],c[i+1]))
-        
-    v.append(0)
-    
-    C = list(map(lambda a: a,c))
-    
-    eixo_x = np.linspace(0,1,10)
+    # u(x)
+    eixo_x = np.linspace(0,1,N)
     eixo_y = list(map(lambda a: 0.5*a*(1-a),eixo_x))#list(map(lambda a: np.sin(np.pi*a),eixo_x))
     plt.plot(eixo_x,eixo_y)
-    
-    plt.scatter(eixo_x,v,color="g")
-    
-    plt.scatter(X,C,color="r")
 
-
+    # Plot v_barra
+    plt.scatter(X,c,color="r")
+    
+   
     
     plt.show()
+    
+    print(bcolors.BOLD+"Erro máximo: "+bcolors.ENDC,erro(eixo_y,c),"\n")
+    
+    
     
     
 main()
