@@ -78,7 +78,7 @@ def v_barra(x,i,c1,c2):
 
 
 def erro(u,v):
-    x = X
+
     erros = []
     
     for ui,vi in zip(u,v):
@@ -100,7 +100,7 @@ def main():
     global X
     global H
     
-    entrada = [0,1,50]
+    entrada = [0,1,2]
     #list(map(int,input('Digite a, b e n no formato "a,b,n" \n\n').split(",")))
     
     a = entrada[0]
