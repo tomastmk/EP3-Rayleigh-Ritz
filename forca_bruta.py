@@ -1,49 +1,62 @@
-def gauss_3_pontos(m,xi,i,j):
-    
-    h = H
-     
-    P1 = 5/9 * m( -0.6**(1/2), xi, i ,j)
-    P2 = 8/9 * m( 0, xi, i , j)
-    P3 = 5/9 * m( 0.6**(1/2), xi, i , j)
-    
-    return P1 + P2 + P3
+import sympy as sp
 
 
-def m_d(u , xi, bi, j):
+
+def matrix_D():
     
-    h = H
-    x = X    
-    
-    
-    return f( u*h/2 + x[xi]/2 + x[xi+1]/2 )*B( bi , u*h/2 + x[xi]/2 + x[xi+1]/2 )
-    
-    
-def di(i):
-    
-    h = H
+    x = X
     n = N
+    h = H
     
-    if i == 0:
-        
-        return h/2 * (gauss_3_pontos(m_d, 0, 0,0) + gauss_3_pontos(m_d, 1 , 0,0)) - 2*h*gauss_3_pontos(m_d,0,-1,0)
+    D = []
     
-    elif i == 1:
-        
-        return h/2 * (gauss_3_pontos(m_d,0,1,0)+gauss_3_pontos(m_d,1,1,0)+gauss_3_pontos(m_d,2,1,0)-gauss_3_pontos(m_d,0,-1,0))
     
-    elif 2 <= i <= n-1:
+    for i in range(1,n+1):
         
-        return h/2 * (gauss_3_pontos(m_d,i-2,i,0)+gauss_3_pontos(m_d,i-1,i,0)+gauss_3_pontos(m_d,i,i,0)+gauss_3_pontos(m_d,i+1,i,0))
-    
-    elif i == n:
-        
-        return h/2 * (gauss_3_pontos(m_d,n-2,n,0)+gauss_3_pontos(m_d,n-1,n,0)+gauss_3_pontos(m_d,n,n,0)+gauss_3_pontos(m_d,n,n+2,0))
+        soma = 0
+        for base in range(0,10000):
+            soma += f(base/10000)*g(i,base/10000)*0.0001
 
-    elif i == n+1:
+        D.append(soma)
         
-        return h/2 * (gauss_3_pontos(m_d,n-1,n,0)+gauss_3_pontos(m_d,n,n,0)) - 2*h*gauss_3_pontos(m_d,n,n+2,0)
+    return D
+
+
+def matrix_A():
+
+    n = N
+    h = H
+    x = X
     
+    A = [ [],[],[],[] ]
     
+    for i in range(n):
+        soma = 0
+        for base in range(0,10000):
+           soma += ( p(base/10000)*g_derivada(i,base/10000)**2 + q(base/10000)*g(i,base/10000)**2)*0.0001
+        A[0].append(soma)
+        
+    for i in range(n-1):
+        soma = 0
+        for base in range(0,10000):
+           soma += ( p(base/10000)*g_derivada(i,base/10000)*g_derivada(i+1,base/10000) + q(base/10000)*g(i,base/10000)*g(i+1,base/10000))*0.0001
+        A[1].append(soma)
+        
+    for i in range(n-2):
+        soma = 0
+        for base in range(0,10000):
+           soma += ( p(base/10000)*g_derivada(i,base/10000)*g_derivada(i+2,base/10000) + q(base/10000)*g(i,base/10000)*g(i+2,base/10000))*0.0001
+        A[2].append(soma)
+        
+    for i in range(n-3):
+        soma = 0
+        for base in range(0,10000):
+           soma += ( p(base/10000)*g_derivada(i,base/10000)*g_derivada(i+3,base/10000) + q(base/10000)*g(i,base/10000)*g(i+3,base/10000))*0.0001
+        A[3].append(soma)
+    
+    return A
+
+
 
 def B(i,x):
     
@@ -64,53 +77,6 @@ def B(i,x):
         
     else:   return 0
     
-
-
-def m_ap(u, xi, i, j):
-    
-    h = H
-    x = X
-    
-    return p( u*h/2 + x[xi]/2 + x[xi+1]/2 ) * g_derivada(i, u*h/2 + x[xi]/2 + x[xi+1]/2 ) * g_derivada(j, u*h/2 + x[xi]/2 + x[xi+1]/2 )
-
-def m_aq(u, xi, gi, gj):
-    
-    h = H
-    x = X
-    
-    return q( u*h/2 + x[xi]/2 + x[xi+1]/2 ) * g(gi, u*h/2 + x[xi]/2 + x[xi+1]/2 ) * g(gj, u*h/2 + x[xi]/2 + x[xi+1]/2 )
-
-
-def aij(i,j):
-
-    if i-2 < 0:
-        P1 = 0
-        Q1 = 0
-    else:
-        P1 = gauss_3_pontos(m_ap,i-2,i,j)
-        Q1 = gauss_3_pontos(m_aq,i-2,i,j)
-
-    
-    if i-1 < 0:
-        P2 = 0
-        Q2 = 0
-    else:
-        P2 = gauss_3_pontos(m_ap,i-1,i,j)
-        Q2 = gauss_3_pontos(m_aq,i-1,i,j)
-    
-    Q3 = gauss_3_pontos(m_aq,i,i,j)
-    P3 = gauss_3_pontos(m_ap,i,i,j)
-    
-    if i >= N:
-        P4 = 0
-        Q4 = 0
-    
-    else: 
-        P4 = gauss_3_pontos(m_ap,i+1,i,j)
-        Q4 = gauss_3_pontos(m_aq,i+1,i,j)
-    
-    return H/2 * (P1+P2+P3+P4 + Q1+Q2+Q3+Q4)
-
 
 
 def g(i,x):
@@ -187,40 +153,6 @@ class bcolors:
     BOLD = "\033[1m"
     ENDC = "\033[0m"
 
-def matrix_D():
-    
-    x = X
-    n = N
-    h = H
-    
-    D = []
-    
-    
-    for i in range(1,n+1):
-        
-        D.append(di(i))
-    
-    return D
-  
-
-def matrix_A():
-
-    n = N
-    h = H
-    x = X
-    
-    A = [ [],[],[],[] ]
-    
-    for i in range(n):
-        A[0].append(aij(i,i))
-    for i in range(n-1):
-        A[1].append(aij(i,i+1))
-    for i in range(n-2):
-        A[2].append(aij(i,i+2))
-    for i in range(n-3):
-        A[3].append(aij(i,i+3))
-    
-    return A
 
 
 def f(x):
@@ -267,7 +199,7 @@ def main():
     global X
     global H
     
-    entrada = [0,1,10]
+    entrada = [0,1,50]
     #list(map(int,input('Digite a, b e n no formato "a,b,n" \n\n').split(",")))
     
     a = entrada[0]
