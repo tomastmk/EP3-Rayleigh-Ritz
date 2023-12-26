@@ -198,6 +198,10 @@ def A():
 
     return [aii, aij1, aij2, aij3]
 
+
+
+
+
 # Aproximação v barra:
 
 def v_barra(c, x):
@@ -208,6 +212,10 @@ def v_barra(c, x):
 
     return sum
 
+
+
+
+
 def main():
 
     global H 
@@ -216,14 +224,14 @@ def main():
     global b
     global X
 
-    a, b, N = 0, 1, 50
+    a, b, N = 0, 1, 10
     H = (b-a)/(N+1)
 
     X = particiona_intervalo(a,b)
     D_vector = D()
     print()
     A_matrix = A()
-
+ 
     print(D_vector)
     print("MATRIZ A")
     for linha in A_matrix:
