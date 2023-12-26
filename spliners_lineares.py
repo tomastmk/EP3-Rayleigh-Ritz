@@ -78,10 +78,10 @@ def matrix_A():
 
 
 # Calcula aproximação de u em x
-def v_barra(x,i,c1,c2):
+def v_barra(x,i,ci,cj):
     
-    P1 = (X[i+1]-x)/H*c1
-    P2 = (x-X[i])/H*c2
+    P1 = (X[i+1]-x)/H*ci
+    P2 = (x-X[i])/H*cj
     
     return  P1 + P2
 
