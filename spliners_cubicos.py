@@ -14,6 +14,17 @@ class bcolors:
     BOLD = "\033[1m"
     ENDC = "\033[0m"
 
+def f(x):
+    return x+(2-x)*np.exp(x) #2*np.pi**2*np.sin(np.pi*x)
+
+def p(x):
+    return np.exp(x)
+
+def q(x):
+    return np.exp(x) #np.pi**2
+
+
+# Aproximação das integrais
 def gauss_3_pontos(m,xi,i,j):
     
     h = H
@@ -23,7 +34,6 @@ def gauss_3_pontos(m,xi,i,j):
     P3 = 5/9 * m( 0.6**(1/2), xi, i , j)
     
     return P1 + P2 + P3
-
 
 def m_ap(u, xi, i, j):
     
@@ -46,9 +56,9 @@ def m_d(u , xi, bi, j):
     
     
     return f( u*h/2 + x[xi]/2 + x[xi+1]/2 )*B( bi , u*h/2 + x[xi]/2 + x[xi+1]/2 )
-    
-    
-
+      
+       
+# função g e B
 def B(i,x):
     
     h = H
@@ -125,7 +135,7 @@ def g_derivada(i,x):
         return derivada_B(n+1,x) - 4*derivada_B(n+2,x)    
            
 
-    
+# Matrizes A e D do sistema linear 
 def matrix_A():
 
     n = N
@@ -175,8 +185,6 @@ def aij(i,j):
     
     return H/2 * (P1+P2+P3+P4 + Q1+Q2+Q3+Q4)
 
-
-
 def matrix_D():
     
     x = X
@@ -218,17 +226,7 @@ def di(i):
         return h/2 * (gauss_3_pontos(m_d,n-1,n,0)+gauss_3_pontos(m_d,n,n,0)) - 2*h*gauss_3_pontos(m_d,n,n+2,0)
 
 
-
-def f(x):
-    return x+(2-x)*np.exp(x) #2*np.pi**2*np.sin(np.pi*x)
-
-def p(x):
-    return np.exp(x)
-
-def q(x):
-    return np.exp(x) #np.pi**2
-
-
+# Calcula aproximação de u em x
 def v_barra(x,c):
     
     n = N
@@ -239,7 +237,7 @@ def v_barra(x,c):
     
     return soma
     
-
+# Calcula maior erro entre funções u e v
 def erro(u,v):
 
     erros = []
@@ -256,7 +254,8 @@ def erro(u,v):
         
     return max
 
-      
+    
+# main
 def main():
     
     global N
