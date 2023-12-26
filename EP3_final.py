@@ -1,7 +1,6 @@
 from solve_SDP.main import system_solve  #EP2
 import matplotlib.pyplot as plt
 import numpy as np
-import sympy as sp
 
 class bcolors:
     BOLD = "\033[1m"
