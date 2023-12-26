@@ -1,19 +1,136 @@
 from solve_SDP.main import system_solve  #EP2
 import matplotlib.pyplot as plt
 import numpy as np
-
+import sympy as sp
 
 class bcolors:
-    OKBLUE    = '\033[94m'
-    OKGREEN   = '\033[92m'
-    WARNING   = '\033[93m'
-    RED = "\033[0;31m"
-    BROWN = "\033[0;33m"
-    PURPLE = "\033[0;35m"
-    CYAN = "\033[0;36m"
     BOLD = "\033[1m"
     ENDC = "\033[0m"
 
+
+# Definindo funções do problema
+
+def f(x):
+    return x+(2-x)*np.exp(x) #2*np.pi**2*np.sin(np.pi*x)
+
+def p(x):
+    return np.exp(x)
+
+def q(x):
+    return np.exp(x) #np.pi**2
+
+def u(x):
+    return (x-1)*(np.exp(-x)-1)
+
+
+'''
+
+def f(x):
+    return 1 
+
+def p(x):
+    return 1
+
+def q(x):
+    return 0 
+    
+def u(x):
+    return 0.5*x*(1 - x)
+
+'''
+
+
+
+# Matrizes A e D do sistema linear 
+def matrix_D(linear = True):
+    
+    x = X
+    n = N
+    h = H
+    
+    D = []
+    
+    if linear is True:
+        for i in range(1,n+1):
+            
+            Q1 = (h/2)*(  f( (x[i]+x[i-1]) /2 )  )
+            Q2 = (h/2)*(  f( (x[i]+x[i+1]) /2 )  )
+        
+            D.append( Q1+Q2 )
+    else:
+        for i in range(1,n+1):
+            D.append(di(i))
+            
+    return D
+  
+def matrix_A(linear = True):
+
+    n = N
+    h = H
+    x = X
+    
+    if linear is True:
+        
+        A = [ [],[] ]
+        
+        # Primeira Diagonal Principal
+        for i in range(1,n+1):
+            
+            Q3 = p( (x[i]+x[i-1])/2 ) / h
+            Q4 = h/4 * q( (x[i]+x[i-1])/2 )
+            
+            Q5 = p( (x[i]+x[i+1])/2 ) / h
+            Q6 = h/4 * q( (x[i]+x[i+1])/2 )
+
+            A[0].append( Q3+Q4+Q5+Q6 )
+            
+        # Segunda Diagonal Principal
+        for i in range(1,n):
+            
+            Q7 = -p( (x[i]+x[i+1])/2 ) / h
+            Q8 = q( (x[i]+x[i+1])/2 ) / 2
+            
+            A[1].append( Q7+Q8 )
+    
+    else:
+        A = [ [],[],[],[] ]
+        
+        for i in range(1,n):
+            A[0].append(aij(i,i))
+        for i in range(1,n-1):
+            A[1].append(aij(i,i+1))
+        for i in range(1,n-2):
+            A[2].append(aij(i,i+2))
+        for i in range(1,n-3):
+            A[3].append(aij(i,i+3))
+        
+    return A
+
+# Calcula aproximação de u em x
+def v_barra(x,c):
+    
+    n = N
+    
+    soma = 0
+    for i in range(n):
+        soma += c[i]*g(i,x)
+    
+    return soma
+
+# Calcula maior erro entre funções u e v
+def erro(u,v):
+
+    max = 0
+    for ui,vi in zip(u,v):
+        
+        erro = abs(ui-vi)
+        
+        if erro>max:
+            max = erro
+        
+    return max
+
+# Splines cúbicos
 def gauss_3_pontos(m,xi,i,j):
     
     h = H
@@ -23,7 +140,6 @@ def gauss_3_pontos(m,xi,i,j):
     P3 = 5/9 * m( 0.6**(1/2), xi, i , j)
     
     return P1 + P2 + P3
-
 
 def m_ap(u, xi, i, j):
     
@@ -48,7 +164,6 @@ def m_d(u , xi, bi, j):
     return f( u*h/2 + x[xi]/2 + x[xi+1]/2 )*B( bi , u*h/2 + x[xi]/2 + x[xi+1]/2 )
     
     
-
 def B(i,x):
     
     h = H
@@ -84,7 +199,6 @@ def derivada_B(i,x):
     elif 1<t and t<=2:   return -3/4 * (2-t)**2
         
     else:   return 0
-
 
 def g(i,x):
     
@@ -125,26 +239,6 @@ def g_derivada(i,x):
         return derivada_B(n+1,x) - 4*derivada_B(n+2,x)    
            
 
-    
-def matrix_A():
-
-    n = N
-    h = H
-    x = X
-    
-    A = [ [],[],[],[] ]
-    
-    for i in range(1,n):
-        A[0].append(aij(i,i))
-    for i in range(1,n-1):
-        A[1].append(aij(i,i+1))
-    for i in range(1,n-2):
-        A[2].append(aij(i,i+2))
-    for i in range(1,n-3):
-        A[3].append(aij(i,i+3))
-    
-    return A
-
 def aij(i,j):
 
     if i-2 < 0:
@@ -175,23 +269,6 @@ def aij(i,j):
     
     return H/2 * (P1+P2+P3+P4 + Q1+Q2+Q3+Q4)
 
-
-
-def matrix_D():
-    
-    x = X
-    n = N
-    h = H
-    
-    D = []
-    
-    
-    for i in range(1,n+1):
-        
-        D.append(di(i))
-    
-    return D
-  
 def di(i):
     
     h = H
@@ -218,99 +295,71 @@ def di(i):
         return h/2 * (gauss_3_pontos(m_d,n-1,n,0)+gauss_3_pontos(m_d,n,n,0)) - 2*h*gauss_3_pontos(m_d,n,n+2,0)
 
 
-
-def f(x):
-    return x+(2-x)*np.exp(x) #2*np.pi**2*np.sin(np.pi*x)
-
-def p(x):
-    return np.exp(x)
-
-def q(x):
-    return np.exp(x) #np.pi**2
-
-
-def v_barra(x,c):
-    
-    n = N
-    
-    soma = 0
-    for i in range(n):
-        soma += c[i]*g(i,x)
-    
-    return soma
-    
-
-def erro(u,v):
-
-    erros = []
-    
-    for ui,vi in zip(u,v):
-        erro = abs(ui-vi)
-        erros.append(erro)
-        
-    max = 0
-    
-    for erro in erros:
-        if erro>max:
-            max = erro
-        
-    return max
-
-      
+# Main      
 def main():
     
-    global N
-    global X
-    global H
+    entrada = list(map(int,input(bcolors.BOLD+'\nDigite a, b e n no formato "a,b,n":     '+bcolors.ENDC).split(",")))
+    linear = input(bcolors.BOLD+"Spline Linear (S/N):      "+bcolors.ENDC)
     
-    entrada = [0,1,19]
-    #list(map(int,input('Digite a, b e n no formato "a,b,n" \n\n').split(",")))
+    if linear == "S" or linear == "s":
+        linear = True
+    else:
+        linear = False
     
+    # Definindo cte globais
     a = entrada[0]
     b = entrada[1]
-    N = entrada[2]
     
-    H = (b-a)/(N+1)
-    X = [ a+i*H for i in range(N+2) ]
+    global N;   N = entrada[2]
+    global H;   H = (b-a)/(N+1)
+    global X;   X = [ a+i*H for i in range(N+2) ]    
+    
+    
+    # Montando e Resolvendo Sistema Ac = D
+    if linear is True:
+        A = matrix_A()
+        D = matrix_D()
+        c = system_solve(A,D,1)
+        
+        # Adiciona c_0 e c_(n+1)
+        c.insert(0,0)
+        c.append(0)
+        
+        # Plot v_barra
+        plt.scatter(X,c,color="r")
+    
 
-    
-    A = matrix_A()
-    D = matrix_D()
+    else:
+        A = matrix_A(linear = False)
+        D = matrix_D(linear = False)
+        c = system_solve(A,D,3)
+        
+        # Adiciona c_0 e c_(n+1)
+        c.insert(0,0)
+        c.append(0)
+        
+        # Plot v_barra
+        linha = [i*0.0005 for i in range(2001)]
+        v_b = [v_barra(x,c) for x in linha]
+        plt.scatter(linha,v_b,color="r")
 
-    c = system_solve(A,D,3)
-    
-    # Adiciona c_0 e c_(n+1)
-    c.insert(0,0)
-    c.append(0)
-    
-    print("\nA = ",A)
-    #print("\nD = ",D)
-    #print("\nc = ",c)
 
     # u(x)
-    eixo_x = np.linspace(0,1,N+1)
-    eixo_y = list(map(lambda a: (a-1)*(np.exp(-a)-1),eixo_x))#list(map(lambda a: np.sin(np.pi*a),eixo_x))
+    eixo_x = np.linspace(0,1,N+2)
+    eixo_y = list(map(u,eixo_x))
     plt.plot(eixo_x,eixo_y)
 
-    linha = []
-    for i in range(2001):
-        linha.append(i*0.0005)
-        
-    aprox = []
-    for x in linha:
-        aprox.append(v_barra(x,c))
 
-    # Plot v_barra
-    plt.scatter(linha,aprox,color="r")
-    plt.legend("uv")
-    
-    plt.xlabel('x')
-    plt.ylabel('y')
-
+    # Print Erro
     print(bcolors.BOLD+"\nErro máximo: "+bcolors.ENDC,erro(eixo_y,c),"\n")
 
-    plt.show()
-    
+    # Configurações do Plot
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.legend("uv")
 
+    plt.show()
+
+    
     
 main()
