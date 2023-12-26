@@ -14,6 +14,22 @@ class bcolors:
     BOLD = "\033[1m"
     ENDC = "\033[0m"
 
+
+# Definindo funções do problema
+def f(x):
+    return 1 #2*np.pi**2*np.sin(np.pi*x)
+
+def p(x):
+    return 1
+
+def q(x):
+    return 0 #np.pi**2
+
+def u(x):
+    return 0.5*x*(1 - x)
+
+
+# Matrizes A e D do sistema linear 
 def matrix_D():
     
     x = X
@@ -21,7 +37,6 @@ def matrix_D():
     h = H
     
     D = []
-    
     
     for i in range(1,n):
         
@@ -32,7 +47,6 @@ def matrix_D():
     
     return D
   
-
 def matrix_A():
 
     n = N
@@ -53,7 +67,7 @@ def matrix_A():
         A[0].append( Q3+Q4+Q5+Q6 )
         
     # Segunda Diagonal Principal
-    for i in range(n-2):
+    for i in range(1,n-1):
         
         Q7 = -p( (x[i]+x[i+1])/2 ) / h
         Q8 = q( (x[i]+x[i+1])/2 ) / 2
@@ -63,31 +77,23 @@ def matrix_A():
     return A
 
 
-def f(x):
-    return -1 #2*np.pi**2*np.sin(np.pi*x)
-
-def p(x):
-    return -1
-
-def q(x):
-    return 0 #np.pi**2
-
-
-def v_barra(x,i,c1,c2):
-    return (X[i+1]-x)/H*c1 + (x-X[i])/H*c2
+# Calcula aproximação de u em x
+def v_barra(x,i,ci,cj):
+    
+    P1 = (X[i+1]-x)/H*ci
+    P2 = (x-X[i])/H*cj
+    
+    return  P1 + P2
 
 
+# Calcula maior erro entre funções u e v
 def erro(u,v):
 
-    erros = []
-    
-    for ui,vi in zip(u,v):
-        erro = abs(ui-vi)
-        erros.append(erro)
-        
     max = 0
-    
-    for erro in erros:
+    for ui,vi in zip(u,v):
+        
+        erro = abs(ui-vi)
+        
         if erro>max:
             max = erro
         
@@ -96,54 +102,48 @@ def erro(u,v):
       
 def main():
     
-    global N
-    global X
-    global H
-    
-    entrada = [0,1,2]
+    entrada = [0,1,10]
     #list(map(int,input('Digite a, b e n no formato "a,b,n" \n\n').split(",")))
     
+    # Definindo cte globais
     a = entrada[0]
     b = entrada[1]
-    N = entrada[2]
     
-    H = (b-a)/(N)
-    X = [ a+i*H for i in range(N+1) ]
-
+    global N;   N = entrada[2]
+    global H;   H = (b-a)/(N)
+    global X;   X = [ a+i*H for i in range(N+1) ]    
     
+    
+    # Montando e Resolvendo Sistema Ac = D
     A = matrix_A()
     D = matrix_D()
-
+    
     c = system_solve(A,D,1)
+    
     
     # Adiciona c_0 e c_(n+1)
     c.insert(0,0)
     c.append(0)
-    
-    '''
-    print("\nA = ",A)
-    print("\nD = ",D)
-    print("\nc = ",c)
-    '''
 
     # u(x)
     eixo_x = np.linspace(0,1,N+1)
-    eixo_y = list(map(lambda a: 0.5*a*(1-a),eixo_x))#list(map(lambda a: np.sin(np.pi*a),eixo_x))
+    eixo_y = list(map(u,eixo_x))
     plt.plot(eixo_x,eixo_y)
 
     # Plot v_barra
     plt.scatter(X,c,color="r")
-    plt.legend("uv")
     
+    # Print Erro
+    print(bcolors.BOLD+"\nErro máximo: "+bcolors.ENDC,erro(eixo_y,c),"\n")
+
+    # Configurações do Plot
     plt.xlabel('x')
     plt.ylabel('y')
+    plt.legend("uv")
 
-    print(bcolors.BOLD+"\nErro máximo: "+bcolors.ENDC,erro(eixo_y,c),"\n")
 
     plt.show()
     
-    
-    d
     
     
 main()
