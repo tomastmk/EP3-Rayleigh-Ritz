@@ -1,7 +1,24 @@
-import sympy as sp
+from solve_SDP.main import system_solve  #EP2
+import matplotlib.pyplot as plt
+import numpy as np
 
 
+class bcolors:
+    BOLD = "\033[1m"
+    ENDC = "\033[0m"
 
+# Definindo funções do problema
+def f(x):
+    return x+(2-x)*np.exp(x) #2*np.pi**2*np.sin(np.pi*x)
+
+def p(x):
+    return np.exp(x)
+
+def q(x):
+    return np.exp(x) #np.pi**2
+
+
+# Matrizes A e D do sistema linear 
 def matrix_D():
     
     x = X
@@ -20,7 +37,6 @@ def matrix_D():
         D.append(soma)
         
     return D
-
 
 def matrix_A():
 
@@ -56,8 +72,7 @@ def matrix_A():
     
     return A
 
-
-
+# Funções B e g
 def B(i,x):
     
     h = H
@@ -77,7 +92,22 @@ def B(i,x):
         
     else:   return 0
     
-
+def derivada_B(i,x):
+    a = 0
+    h = H
+    t = (x-a-i*h)/h
+    
+    if t<=-2:   return 0
+    
+    elif -2<t and t<=-1:   return 3/4 * (2+t)**2
+        
+    elif -1<t and t<=0:   return 3/4 * (2+t)**2 - 3*(1+t)**2
+        
+    elif 0<t and t<=1:    return -3/4 * (2-t)**2 + 3*(1-t)**2
+        
+    elif 1<t and t<=2:   return -3/4 * (2-t)**2
+        
+    else:   return 0
 
 def g(i,x):
     
@@ -98,7 +128,6 @@ def g(i,x):
     elif i ==n+1:
         return B(n+1,x) - 4*B(n+2,x)
     
-  
 def g_derivada(i,x):
     
     n = N
@@ -118,53 +147,8 @@ def g_derivada(i,x):
     elif i ==n+1:
         return derivada_B(n+1,x) - 4*derivada_B(n+2,x)    
            
-           
-def derivada_B(i,x):
-    a = 0
-    h = H
-    t = (x-a-i*h)/h
-    
-    if t<=-2:   return 0
-    
-    elif -2<t and t<=-1:   return 3/4 * (2+t)**2
-        
-    elif -1<t and t<=0:   return 3/4 * (2+t)**2 - 3*(1+t)**2
-        
-    elif 0<t and t<=1:    return -3/4 * (2-t)**2 + 3*(1-t)**2
-        
-    elif 1<t and t<=2:   return -3/4 * (2-t)**2
-        
-    else:   return 0
 
-
-from solve_SDP.main import system_solve  #EP2
-import matplotlib.pyplot as plt
-import numpy as np
-import sympy as sp
-
-class bcolors:
-    OKBLUE    = '\033[94m'
-    OKGREEN   = '\033[92m'
-    WARNING   = '\033[93m'
-    RED = "\033[0;31m"
-    BROWN = "\033[0;33m"
-    PURPLE = "\033[0;35m"
-    CYAN = "\033[0;36m"
-    BOLD = "\033[1m"
-    ENDC = "\033[0m"
-
-
-
-def f(x):
-    return x+(2-x)*np.exp(x) #2*np.pi**2*np.sin(np.pi*x)
-
-def p(x):
-    return np.exp(x)
-
-def q(x):
-    return np.exp(x) #np.pi**2
-
-
+# Calcula aproximação de u em x
 def v_barra(x,c):
     
     n = N
@@ -174,8 +158,9 @@ def v_barra(x,c):
         soma += c[i]*g(i,x)
     
     return soma
-    
 
+
+# Calcula maior erro entre funções u e v
 def erro(u,v):
 
     erros = []
@@ -195,20 +180,15 @@ def erro(u,v):
       
 def main():
     
-    global N
-    global X
-    global H
-    
-    entrada = [0,1,50]
-    #list(map(int,input('Digite a, b e n no formato "a,b,n" \n\n').split(",")))
+
+    entrada = list(map(int,input('Digite a, b e n no formato "a,b,n" \n\n').split(",")))
     
     a = entrada[0]
     b = entrada[1]
-    N = entrada[2]
-    
-    H = (b-a)/(N+1)
-    X = [ a+i*H for i in range(N+2) ]
-
+   
+    global N;  N = entrada[2]
+    global X;   X = [ a+i*H for i in range(N+2) ]
+    global H;   H = (b-a)/(N+1)
     
     A = matrix_A()
     D = matrix_D()

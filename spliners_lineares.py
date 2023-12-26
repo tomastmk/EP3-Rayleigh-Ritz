@@ -102,8 +102,7 @@ def erro(u,v):
       
 def main():
     
-    entrada = [0,1,10]
-    #list(map(int,input('Digite a, b e n no formato "a,b,n" \n\n').split(",")))
+    entrada = list(map(int,input('Digite a, b e n+1 no formato "a,b,n+1" \n\n').split(",")))
     
     # Definindo cte globais
     a = entrada[0]

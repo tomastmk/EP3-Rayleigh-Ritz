@@ -8,7 +8,6 @@ class bcolors:
 
 
 # Definindo funções do problema
-
 def f(x):
     return x+(2-x)*np.exp(x) #2*np.pi**2*np.sin(np.pi*x)
 
@@ -38,9 +37,7 @@ def u(x):
 
 '''
 
-
-
-# Matrizes A e D do sistema linear 
+# Matrizes 
 def matrix_D(linear = True):
     
     x = X
@@ -105,6 +102,7 @@ def matrix_A(linear = True):
         
     return A
 
+
 # Calcula aproximação de u em x
 def v_barra(x,c):
     
@@ -115,6 +113,7 @@ def v_barra(x,c):
         soma += c[i]*g(i,x)
     
     return soma
+
 
 # Calcula maior erro entre funções u e v
 def erro(u,v):
@@ -128,6 +127,7 @@ def erro(u,v):
             max = erro
         
     return max
+
 
 # Splines cúbicos
 def gauss_3_pontos(m,xi,i,j):
@@ -294,7 +294,7 @@ def di(i):
         return h/2 * (gauss_3_pontos(m_d,n-1,n,0)+gauss_3_pontos(m_d,n,n,0)) - 2*h*gauss_3_pontos(m_d,n,n+2,0)
 
 
-# Main      
+# main      
 def main():
     
     entrada = list(map(int,input(bcolors.BOLD+'\nDigite a, b e n no formato "a,b,n":     '+bcolors.ENDC).split(",")))

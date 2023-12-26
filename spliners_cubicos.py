@@ -282,9 +282,6 @@ def main():
     c.insert(0,0)
     c.append(0)
     
-    print("\nA = ",A)
-    #print("\nD = ",D)
-    #print("\nc = ",c)
 
     # u(x)
     eixo_x = np.linspace(0,1,N+1)
