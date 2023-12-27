@@ -9,16 +9,19 @@ class bcolors:
 
 # Definindo funções do problema
 def f(x):
-    return x+(2-x)*np.exp(x) #2*np.pi**2*np.sin(np.pi*x)
+    return 1   # Função do Exemplo 1
+                # Função do Exemplo 2: x+(2-x)*np.exp(x) 
 
 def p(x):
-    return np.exp(x)
+    return 1   
+                #Função do Exemplo 2: np.exp(x)
 
 def q(x):
-    return np.exp(x) #np.pi**2
+    return 0    # Função do Exemplo 1
+                #Função do Exemplo 2: np.exp(x) 
 
 def u(x):
-    return (x-1)*(np.exp(-x)-1)
+    return 0.5*x*(1-x)#(x-1)*(np.exp(-x)-1)
 
 
 '''
